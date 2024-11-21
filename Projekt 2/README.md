@@ -1,4 +1,4 @@
-# Projekt 2
+# Framework Fork-Join
 Rozwiązywanie problemu w sposób zrównoleglony z wykorzystaniem **ForkJoinPool**
 
 ## Wybór problemu 

@@ -1,0 +1,1 @@
+# Operacje agregacyjne
