@@ -8,7 +8,7 @@ import java.util.concurrent.ThreadPoolExecutor;
 public class ATMSimulatorThreadPoolExecutor {
     public static void main(String[] args) throws InterruptedException {
         Account account = new Account(1000);
-        ThreadPoolExecutor executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(500);
+        ThreadPoolExecutor executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(8);
         List<Callable<Void>> tasks = new ArrayList<>();
         for (int i = 0; i < 500; i++) {
             tasks.add(() -> {
