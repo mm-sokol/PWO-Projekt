@@ -1,6 +1,6 @@
 package org.pwo.parallel;
 
-import org.pwo.common.PointUtils;
+import org.pwo.utils.PointUtils;
 
 import java.awt.geom.Point2D;
 import java.util.*;
@@ -57,6 +57,7 @@ public class GrahamScanTask extends RecursiveTask<List<Point2D>> {
         hull.stream()
                 .min(Comparator.comparingDouble(point -> -point.getY()))
                 .ifPresent(minPoint -> {
+                    // swap it with the first point
                     Point2D firstPoint = hull.getFirst();
                     hull.set(0, minPoint);
                     hull.set(hull.indexOf(minPoint), firstPoint);
@@ -67,23 +68,28 @@ public class GrahamScanTask extends RecursiveTask<List<Point2D>> {
         hull.subList(1, hull.size()).sort(Comparator.comparingDouble(point -> PointUtils.polarAngle(point, hull.getFirst())));
 
 
-        int m = 1;
+        int vecEnd = 1;
         for (int i = 2; i < hull.size(); i++) {
-            while (PointUtils.counterClockwise(hull.get(m-1), hull.get(m), hull.get(i))<=0) {
-                if (m>1) {
-                    m--;
-                } else if (m==1) {
+
+            // while hull[i] is collinear or to the right of vector [hull[vecEnd-1], hull[vecEnd]]
+            while (PointUtils.counterClockwise(hull.get(vecEnd-1), hull.get(vecEnd), hull.get(i))<=0) {
+
+                if (vecEnd>1) { // check different vector
+                    vecEnd--;
+                } else if (vecEnd==1) { // there's nothing we can do if vecEnd==1
                     break;
-                } else {
+                } else { // check the next point
                     i++;
                 }
             }
-            m++;
+            vecEnd++;
+
+            
             Point2D point = hull.get(i);
-            hull.set(i, hull.get(m));
-            hull.set(m, point);
+            hull.set(i, hull.get(vecEnd));
+            hull.set(vecEnd, point);
         }
-        return hull.subList(0, m+1);
+        return hull.subList(0, vecEnd+1);
     }
 
     private List<Point2D> merge(List<Point2D> leftHull, List<Point2D> rightHull) {
