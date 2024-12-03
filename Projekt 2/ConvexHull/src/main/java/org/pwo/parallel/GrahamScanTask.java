@@ -2,10 +2,13 @@ package org.pwo.parallel;
 
 import org.pwo.utils.PointUtils;
 
+import java.awt.*;
 import java.awt.geom.Point2D;
 import java.util.*;
+import java.util.List;
 import java.util.concurrent.ForkJoinTask;
 import java.util.concurrent.RecursiveTask;
+import java.util.stream.Collectors;
 
 
 public class GrahamScanTask extends RecursiveTask<List<Point2D>> {
@@ -54,18 +57,20 @@ public class GrahamScanTask extends RecursiveTask<List<Point2D>> {
                 .toList());
 
         // get the lowest point in Y direction
-        hull.stream()
-                .min(Comparator.comparingDouble(point -> -point.getY()))
-                .ifPresent(minPoint -> {
-                    // swap it with the first point
-                    Point2D firstPoint = hull.getFirst();
-                    hull.set(0, minPoint);
-                    hull.set(hull.indexOf(minPoint), firstPoint);
-                });
+        hull = hull.stream().distinct()
+                .sorted(Comparator.comparingDouble(p->-p.getY()))
+                .collect(Collectors.toList());
+//                .ifPresent(minPoint -> {
+//                    // swap it with the first point
+//                    Point2D firstPoint = hull.getFirst();
+//                    hull.set(0, minPoint);
+//                    hull.set(hull.indexOf(minPoint), firstPoint);
+//                });
 
+        Point2D first = hull.getFirst();
 
         // sort the other points based on polar angle between point and pivot
-        hull.subList(1, hull.size()).sort(Comparator.comparingDouble(point -> PointUtils.polarAngle(point, hull.getFirst())));
+        hull.subList(1, hull.size()).sort(Comparator.comparingDouble(point -> PointUtils.polarAngle(point, first)));
 
 
         int vecEnd = 1;
