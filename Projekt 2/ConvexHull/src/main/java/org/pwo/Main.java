@@ -1,8 +1,10 @@
 package org.pwo;
 
 import org.pwo.parallel.GrahamScanTask;
+import org.pwo.utils.PointRenderer;
 import org.pwo.utils.PointUtils;
 
+import java.awt.*;
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.List;
@@ -18,6 +20,8 @@ public class Main {
 
         List<Point2D> points = PointUtils.readList("src/main/resources/problem1.point2d");
 
+        PointRenderer renderer = new PointRenderer("Convex Hull: problem 1", points, Color.red, 20);
+
         GrahamScanTask grahamScanTask = new GrahamScanTask(points, 10);
 
         try (ForkJoinPool pool = new ForkJoinPool()) {
@@ -25,6 +29,7 @@ public class Main {
             for (Point2D p : result) {
                 System.out.println(p);
             }
+            renderer.addLines(result, Color.blue, 10);
         }
         catch (Exception e) {
             e.printStackTrace();
