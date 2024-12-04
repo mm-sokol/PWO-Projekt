@@ -13,16 +13,53 @@ import java.util.stream.Collectors;
 
 public class GrahamScanTask extends RecursiveTask<List<Point2D>> {
 
+    private static final Object _lock = new Object();
+
     @Override
     protected List<Point2D> compute() {
-        _points.sort(Comparator.comparingDouble(Point2D::getX));
 
-        if (_points.size() > _minimumSize) {
+        if (_points.size() < 2) {
+            return _points;
+        } else if (_points.size() < 3) {
+            if (_points.getFirst().getY()>_points.getLast().getY()) {
+                Point2D first = _points.getFirst();
+                _points.add(0, _points.getLast());
+                _points.add(1, first);
+            }
+            return _points;
+//        } else if (_points.size() == 3) {
+//            _points.sort(Comparator.comparingDouble(p -> -p.getY()));
+//            var first = _points.getFirst();
+//            _points.subList(1, _points.size()).sort(Comparator.comparingDouble(p -> PointUtils.polarAngle(p, first)));
+//            return _points;
+
+        } else if (_points.size() > _minimumSize) {
             // split points into groups
-            return ForkJoinTask.invokeAll(createSubtasks())
-                    .stream()
-                    .map(ForkJoinTask::join)
-                    .reduce(new ArrayList<>(), this::merge);
+//           return ForkJoinTask.invokeAll(createSubtasks())
+//                   .stream()
+//                   .map(ForkJoinTask::join)
+//                   .reduce(new ArrayList<>(), this::merge);
+            synchronized (_lock) {
+            int middle = this._points.size() / 2;
+                System.out.println("Sublist left:");
+                printPointList(this._points.subList(0, middle));
+
+            GrahamScanTask left = new GrahamScanTask(
+                    new ArrayList<>(this._points.subList(0, middle)),
+                    _minimumSize
+            );
+
+            System.out.println("Sublist right:");
+            printPointList(this._points.subList(middle, this._points.size()));
+
+            GrahamScanTask right = new GrahamScanTask(
+                    new ArrayList<>(this._points.subList(middle, this._points.size())),
+                    _minimumSize
+            );
+            left.fork();
+            right.fork();
+            return merge(left.join(), right.join());
+            }
         } else {
             // compute GrahamScan
             return scan();
@@ -32,7 +69,7 @@ public class GrahamScanTask extends RecursiveTask<List<Point2D>> {
     public GrahamScanTask(List<Point2D> points, int threshold) {
         this._minimumSize = threshold;
         this._points = points;
-
+        this._points.sort(Comparator.comparingDouble(Point2D::getY));
         this._points.sort(Comparator.comparingDouble(Point2D::getX));
     }
 
@@ -40,10 +77,12 @@ public class GrahamScanTask extends RecursiveTask<List<Point2D>> {
         List<GrahamScanTask> tasks = new ArrayList<>();
 
         int middle = this._points.size() / 2;
+
         tasks.add(new GrahamScanTask(
                 new ArrayList<>(this._points.subList(0, middle)),
                 _minimumSize
         ));
+
         tasks.add(new GrahamScanTask(
                 new ArrayList<>(this._points.subList(middle, this._points.size())),
                 _minimumSize
@@ -97,80 +136,244 @@ public class GrahamScanTask extends RecursiveTask<List<Point2D>> {
         return hull.subList(0, vecEnd+1);
     }
 
-    private List<Point2D> merge(List<Point2D> leftHull, List<Point2D> rightHull) {
+//    private List<Point2D> merge(List<Point2D> leftHull, List<Point2D> rightHull) {
+//
+//
+//        if (leftHull.isEmpty())
+//            return rightHull;
+//        if (rightHull.isEmpty())
+//            return leftHull;
+//
+//        for (Point2D p : leftHull) {
+//            for (Point2D p1 : rightHull) {
+//                if (p.getX() > p1.getX()) {
+//                    System.out.println("Merging process is not right");
+//                }
+//            }
+//        }
+//
+//        System.out.println("Left Hull-------------------------------------");
+////        leftHull.forEach(p -> System.out.println(leftHull.indexOf(p)+"\t("+p.getX()+", "+p.getY()+")"));
+//        leftHull.forEach(p -> System.out.println(p.getX()+", "+p.getY()));
+//        System.out.println("Right Hull-------------------------------------");
+////        rightHull.forEach(p -> System.out.println(rightHull.indexOf(p)+"\t("+p.getX()+", "+p.getY()+")"));
+//        rightHull.forEach(p -> System.out.println(p.getX()+", "+p.getY()));
+//        System.out.println("-----------------------------------------------");
+//
+//
+//        int upperTangentP1Index = 0;
+//        for (int i = 0; i < leftHull.size(); i++) {
+//            if (leftHull.get(upperTangentP1Index).getX() < leftHull.get(i).getX()) {
+//                upperTangentP1Index = i;
+//            }
+//        }
+//        int lowerTangentP1Index = upperTangentP1Index;
+//        System.out.println("P1: leftHull["+lowerTangentP1Index+"]");
+//
+//        int upperTangentP2Index = 0;
+//        for (int i = 0; i < rightHull.size(); i++) {
+//            if (rightHull.get(upperTangentP2Index).getX() > rightHull.get(i).getX()) {
+//                upperTangentP2Index = i;
+//            }
+//        }
+//        int lowerTangentP2Index = upperTangentP2Index;
+//        System.out.println("P2: rightHull["+lowerTangentP2Index+"]");
+//
+//        boolean stop = false;
+//        while(!stop) {
+//            stop = true;
+//            System.out.println("Iterating-lower-1------------------------------");
+//            while (PointUtils.isCounterClockwise(
+//                    rightHull.get(lowerTangentP2Index),
+//                    leftHull.get(lowerTangentP1Index),
+//                    leftHull.get((lowerTangentP1Index + 1) % leftHull.size())
+//            )) {
+//                System.out.println("rightHull["+lowerTangentP2Index+"], leftHull["+lowerTangentP1Index+"], leftHull["+(lowerTangentP1Index + 1) % leftHull.size()+"]");
+//                lowerTangentP1Index = (lowerTangentP1Index + 1) % leftHull.size();
+//                stop = false;
+//            }
+//            System.out.println("Iterating-lower-2------------------------------");
+//            while (PointUtils.isClockwise(
+//                    leftHull.get(lowerTangentP1Index),
+//                    rightHull.get(lowerTangentP2Index),
+//                    rightHull.get((lowerTangentP2Index + 1) % rightHull.size())
+//            )) {
+//                System.out.println("leftHull["+lowerTangentP1Index+"], rightHull["+lowerTangentP2Index+"], rightHull["+(lowerTangentP2Index + 1) % rightHull.size()+"]");
+//                lowerTangentP2Index = (lowerTangentP2Index + 1) % rightHull.size();
+//                stop= false;
+//            }
+//        }
+//        System.out.println("Lower tangent: "+
+//                "P1("+leftHull.get(lowerTangentP1Index).getX()+
+//                ", "+leftHull.get(lowerTangentP1Index).getY()+
+//                ") -> P2("+rightHull.get(lowerTangentP2Index).getX()+
+//                ", "+rightHull.get(lowerTangentP2Index).getY()+
+//                ")");
+//
+//        stop = false;
+//        while(!stop) {
+//            stop = true;
+//            System.out.println("Iterating-upper-1------------------------------");
+//            while (PointUtils.isClockwise(
+//                    rightHull.get(upperTangentP2Index),
+//                    leftHull.get(upperTangentP1Index),
+//                    leftHull.get((upperTangentP1Index - 1 + leftHull.size()) % leftHull.size())
+//            )) {
+//                System.out.println("rightHull["+upperTangentP2Index+"], leftHull["+upperTangentP1Index+"], leftHull["+(upperTangentP1Index - 1 + leftHull.size()) % leftHull.size()+"]");
+//                upperTangentP1Index = (upperTangentP1Index - 1 + leftHull.size()) % leftHull.size();
+//                stop = false;
+//            }
+//            System.out.println("Iterating-upper-2------------------------------");
+//            while (PointUtils.isCounterClockwise(
+//                    leftHull.get(upperTangentP1Index),
+//                    rightHull.get(upperTangentP2Index),
+//                    rightHull.get((upperTangentP2Index + 1) % rightHull.size())
+//            )) {
+//                System.out.println("leftHull["+upperTangentP1Index+"], rightHull["+upperTangentP2Index+"], rightHull["+(upperTangentP2Index + 1) % rightHull.size()+"]");
+//                upperTangentP2Index = (upperTangentP2Index + 1) % rightHull.size();
+//                stop= false;
+//            }
+//        }
+//        System.out.println("Upper tangent: "+
+//                "P1("+leftHull.get(upperTangentP1Index).getX()+
+//                ", "+leftHull.get(upperTangentP1Index).getY()+
+//                ") -> P2("+rightHull.get(upperTangentP2Index).getX()+
+//                ", "+rightHull.get(upperTangentP2Index).getY()+
+//                ")");
+//
+//        List<Point2D> result = new ArrayList<>();
+//
+//        for (int i = upperTangentP1Index; i != lowerTangentP1Index ; i = (i+1) % leftHull.size()) {
+//            result.add(leftHull.get(i));
+//        }
+////        result.add(leftHull.get(lowerTangentP1Index));
+//        for (int i = lowerTangentP2Index; i != upperTangentP2Index ; i = (i+1) % rightHull.size()) {
+//            result.add(rightHull.get(i));
+//        }
+//        result.add(rightHull.get(upperTangentP2Index));
+//
+//        return result;
+//    }
 
+    private List<Point2D> merge(List<Point2D> leftHull, List<Point2D> rightHull) {
         if (leftHull.isEmpty())
             return rightHull;
         if (rightHull.isEmpty())
             return leftHull;
 
+        System.out.println("Left hull -----------------------------------");
+        printPointList(leftHull);
+        System.out.println("Right hull -----------------------------------");
+        printPointList(rightHull);
 
-        Point2D rightmostPointFromLeftHull = leftHull.stream()
-                .max(Comparator.comparingDouble(Point2D::getX))
-                .orElse(null);
-        Point2D leftmostPointFromRightHull = rightHull.stream()
-                .min(Comparator.comparingDouble((Point2D::getX)))
-                .orElse(null);
+        Tuple<Integer, Integer> upperTangent = findUpperTangent(leftHull, rightHull);
+        int upperTangentP1 = upperTangent.first;
+        int upperTangentP2 = upperTangent.second;
+        System.out.println("Upper tangent: P1("+leftHull.get(upperTangentP1)+") -> ("+rightHull.get(upperTangentP2)+")");
 
-        int upperTangentP1Index = leftHull.indexOf(rightmostPointFromLeftHull);
-        int upperTangentP2Index = rightHull.indexOf(leftmostPointFromRightHull);
+        Tuple<Integer, Integer> lowerTangent = findLowerTangent(leftHull, rightHull);
+        int lowerTangentP1 = lowerTangent.first;
+        int lowerTangentP2 = lowerTangent.second;
+        System.out.println("Lower tangent: P1("+leftHull.get(lowerTangentP1)+") -> ("+rightHull.get(lowerTangentP2)+")");
+
+        List<Point2D> result = new ArrayList<>();
+        // Add points from left hull
+        for (int i = upperTangentP1; i != nextIndex(lowerTangentP1, leftHull.size()); i = nextIndex(i, leftHull.size())) {
+            result.add(leftHull.get(i));
+        }
+        // Add points from right hull
+        for (int i = lowerTangentP2; i != nextIndex(upperTangentP2, rightHull.size()); i = nextIndex(i, rightHull.size())) {
+            result.add(rightHull.get(i));
+        }
+
+        return result;
+    }
+
+    private int nextIndex(int index, int size) {
+        return (index + 1) % size;
+    }
+
+    private int previousIndex(int index, int size) {
+        return (index - 1 + size) % size;
+    }
+
+    private int findRightmostPoint(List<Point2D> points) {
+        int rightmost = 0;
+        for (int i = 0; i < points.size(); i++) {
+            if (points.get(i).getX() > points.get(rightmost).getX()) {
+                rightmost = i;
+            }
+        }
+        return rightmost;
+    }
+
+    private int findLeftmostPoint(List<Point2D> points) {
+        int leftmost = 0;
+        for (int i = 0; i < points.size(); i++) {
+            if (points.get(i).getX() < points.get(leftmost).getX()) {
+                leftmost = i;
+            }
+        }
+        return leftmost;
+    }
+
+    private void printPointList(List<Point2D> points) {
+        points.forEach(p->System.out.println(p.getX()+", "+p.getY()));
+    }
+
+    public record Tuple<A, B>(A first, B second) {}
+
+    private Tuple<Integer,Integer> findLowerTangent(List<Point2D> leftHull, List<Point2D> rightHull) {
+        int leftIndex = findRightmostPoint(leftHull);
+        int rightIndex = findLeftmostPoint(rightHull);
+
+        boolean stop = false;
+        while (!stop) {
+            stop = true;
+            while (PointUtils.isCounterClockwise(
+                    rightHull.get(rightIndex),
+                    leftHull.get(leftIndex),
+                    leftHull.get(previousIndex(leftIndex, leftHull.size())))) {
+                leftIndex = previousIndex(leftIndex, leftHull.size());
+                stop = false;
+            }
+            while (PointUtils.isClockwise(
+                    leftHull.get(leftIndex),
+                    rightHull.get(rightIndex),
+                    rightHull.get(nextIndex(rightIndex, rightHull.size())))) {
+                rightIndex = nextIndex(rightIndex, rightHull.size());
+                stop = false;
+            }
+        }
+
+        return new Tuple<>(leftIndex, rightIndex);
+    }
+
+    private Tuple<Integer, Integer> findUpperTangent(List<Point2D> leftHull, List<Point2D> rightHull) {
+        int leftIndex = findRightmostPoint(leftHull);
+        int rightIndex = findLeftmostPoint(rightHull);
+
         boolean stop = false;
         while(!stop) {
             stop = true;
-            while (PointUtils.isCounterClockwise(
-                    rightHull.get(upperTangentP2Index),
-                    leftHull.get(upperTangentP1Index),
-                    leftHull.get((upperTangentP1Index + 1) % leftHull.size())
-            )) {
-                upperTangentP1Index = (upperTangentP1Index + 1) % leftHull.size();
-                stop = false;
-            }
             while (PointUtils.isClockwise(
-                    leftHull.get(upperTangentP1Index),
-                    rightHull.get(upperTangentP2Index),
-                    rightHull.get((upperTangentP2Index + 1) % rightHull.size())
+                    rightHull.get(rightIndex),
+                    leftHull.get(leftIndex),
+                    leftHull.get(nextIndex(leftIndex, leftHull.size()))
             )) {
-                upperTangentP2Index = (upperTangentP2Index - 1 + rightHull.size()) % rightHull.size();
-                stop= false;
-            }
-        }
-
-
-        int lowerTangentP1Index = leftHull.indexOf(rightmostPointFromLeftHull);
-        int lowerTangentP2Index = rightHull.indexOf(leftmostPointFromRightHull);
-        stop = false;
-        while(!stop) {
-            stop = true;
-            while (PointUtils.isClockwise(
-                    rightHull.get(lowerTangentP2Index),
-                    leftHull.get(lowerTangentP1Index),
-                    leftHull.get((lowerTangentP1Index - 1 + leftHull.size()) % leftHull.size())
-            )) {
-                lowerTangentP1Index = (lowerTangentP1Index - 1 + leftHull.size()) % leftHull.size();
+                leftIndex = nextIndex(leftIndex, leftHull.size());
                 stop = false;
             }
             while (PointUtils.isCounterClockwise(
-                    leftHull.get(lowerTangentP1Index),
-                    rightHull.get(lowerTangentP2Index),
-                    rightHull.get((lowerTangentP2Index + 1) % rightHull.size())
+                    leftHull.get(leftIndex),
+                    rightHull.get(rightIndex),
+                    rightHull.get(previousIndex(rightIndex, rightHull.size()))
             )) {
-                lowerTangentP2Index = (lowerTangentP2Index + 1) % rightHull.size();
+                rightIndex = previousIndex(rightIndex, rightHull.size());
                 stop= false;
             }
         }
-
-        List<Point2D> result = new ArrayList<>();
-
-        for (int i = upperTangentP1Index; i != lowerTangentP1Index ; i = (i+1) % leftHull.size()) {
-            result.add(leftHull.get(i));
-        }
-        result.add(leftHull.get(lowerTangentP1Index));
-        for (int i = lowerTangentP2Index; i != upperTangentP2Index ; i = (i+1) % rightHull.size()) {
-            result.add(rightHull.get(i));
-        }
-        result.add(rightHull.get(upperTangentP2Index));
-
-        return result;
+        return new Tuple<>(leftIndex, rightIndex);
     }
 
     private final int _minimumSize;

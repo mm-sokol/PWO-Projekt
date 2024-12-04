@@ -1,11 +1,11 @@
 package org.pwo.utils;
 
 import java.awt.geom.Point2D;
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Scanner;
+import java.util.*;
 
 public class PointUtils {
 
@@ -54,6 +54,23 @@ public class PointUtils {
             e.printStackTrace();
         }
         return list;
+    }
+
+    public static void writeList(String filename, int number) {
+        Random rnd = new Random();
+
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(filename))) {
+            double scale = 1000, offset = 500;
+            for (int i = 0; i < number; i++) {
+                String line = String.format(Locale.US, "%d\t%.2f\t%.2f",
+                        i, rnd.nextDouble()*scale - offset, rnd.nextDouble()*scale - offset);
+                writer.write(line);
+                writer.newLine(); // Move to the next line
+            }
+            System.out.println("Points written to file.");
+        } catch (IOException e) {
+            System.err.println("Error generating points to file: " + e.getMessage());
+        }
     }
 
 }

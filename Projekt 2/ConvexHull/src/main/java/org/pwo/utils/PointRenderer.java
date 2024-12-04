@@ -11,12 +11,13 @@ import java.util.List;
 public class PointRenderer extends JFrame {
 
     public static class ProblemPanel extends JPanel {
-        public ProblemPanel(List<Point2D> points, Color pointColor, List<Point2D> lines, Color linesColor, int pointSize) {
+        public ProblemPanel(List<Point2D> points, Color pointColor, int pointSize, List<Point2D> lines, Color linesColor, int lineWidth) {
             this._points = points;
             this._pointColor = pointColor;
             this._lines = lines;
             this._linesColor = linesColor;
             this._pointSize = pointSize;
+            this._lineWidth = lineWidth;
             calculateOffset();
         }
 
@@ -143,7 +144,26 @@ public class PointRenderer extends JFrame {
                 _panel.zoom(e.getWheelRotation());
             }
         });
+        setVisible(true);
+    }
 
+    public PointRenderer(String title, List<Point2D> points, Color color, int pointSize, List<Point2D> lines, Color lineColor, int lineWidth) {
+        super(title);
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setSize(400, 300);
+        setLocationRelativeTo(null);
+
+        this._panel = new ProblemPanel(points, color, pointSize, lines, lineColor, lineWidth);
+        this._scrollPane = new JScrollPane(this._panel);
+        add(_scrollPane);
+        add(this._panel);
+
+        this._panel.addMouseWheelListener(new MouseWheelListener() {
+            @Override
+            public void mouseWheelMoved(MouseWheelEvent e) {
+                _panel.zoom(e.getWheelRotation());
+            }
+        });
         setVisible(true);
     }
 
