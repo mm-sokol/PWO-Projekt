@@ -1,0 +1,17 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="ConvexHull:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/ConvexHull_jar</output-path>
+    <root id="archive" name="ConvexHull.jar">
+      <element id="module-output" name="ConvexHull" />
+      <element id="extracted-dir" path="$JavaFX21$/javafx-swt.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$JavaFX21$/javafx.web.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$JavaFX21$/javafx.base.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$JavaFX21$/javafx.fxml.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$JavaFX21$/javafx.media.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$JavaFX21$/javafx.swing.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$JavaFX21$/javafx.controls.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$JavaFX21$/javafx.graphics.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$MAVEN_REPOSITORY$/org/slf4j/slf4j-api/1.7.36/slf4j-api-1.7.36.jar" path-in-jar="/" />
+    </root>
+  </artifact>
+</component>
