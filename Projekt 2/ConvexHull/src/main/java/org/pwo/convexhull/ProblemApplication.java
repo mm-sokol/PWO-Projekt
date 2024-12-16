@@ -19,7 +19,7 @@ public class ProblemApplication extends Application {
 
 
         // Set up the Scene
-        Scene scene = new Scene(root, 800, 800);
+        Scene scene = new Scene(root, 1600, 1000);
         Image icon = new Image("coding-brackets.png");
         primaryStage.getIcons().add(icon);
         primaryStage.setResizable(true);

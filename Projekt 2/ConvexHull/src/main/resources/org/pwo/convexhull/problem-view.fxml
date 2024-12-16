@@ -4,7 +4,6 @@
 <?import javafx.scene.canvas.Canvas?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.RadioButton?>
-<?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.control.ToggleGroup?>
 <?import javafx.scene.layout.AnchorPane?>
@@ -41,11 +40,7 @@
                   </RadioButton>
                </children>
             </HBox>
-            <ScrollPane fx:id="scrollPane" onMouseClicked="#onMouseClick" prefHeight="111.0" prefWidth="600.0" VBox.vgrow="ALWAYS">
-               <content>
-                  <Canvas fx:id="problemCanvas" height="800.0" onMouseClicked="#onMouseClick" width="800.0" />
-               </content>
-            </ScrollPane>
+            <Canvas fx:id="problemCanvas" height="1000.0" onMouseClicked="#onMouseClick" width="1600.0" VBox.vgrow="ALWAYS" />
          </children>
       </VBox>
    </children>

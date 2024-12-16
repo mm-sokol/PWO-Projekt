@@ -88,7 +88,7 @@ public class GrahamScan {
 
 
 
-    private static Tuple<Integer, Integer> findUpperTangent(List<Point2D> leftHull, List<Point2D> rightHull) {
+    public static Tuple<Integer, Integer> findUpperTangent(List<Point2D> leftHull, List<Point2D> rightHull) {
         int leftIndex = findRightmostPoint(leftHull);
         int rightIndex = findLeftmostPoint(rightHull);
 
@@ -115,7 +115,7 @@ public class GrahamScan {
         return new Tuple<>(leftIndex, rightIndex);
     }
 
-    private static Tuple<Integer,Integer> findLowerTangent(List<Point2D> leftHull, List<Point2D> rightHull) {
+    public static Tuple<Integer,Integer> findLowerTangent(List<Point2D> leftHull, List<Point2D> rightHull) {
         int leftIndex = findRightmostPoint(leftHull);
         int rightIndex = findLeftmostPoint(rightHull);
 

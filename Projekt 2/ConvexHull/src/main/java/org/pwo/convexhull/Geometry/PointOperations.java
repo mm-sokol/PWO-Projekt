@@ -1,7 +1,9 @@
 package org.pwo.convexhull.Geometry;
 
 import java.awt.geom.Point2D;
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -40,7 +42,14 @@ public class PointOperations {
         return list;
     }
 
-
+    public static void saveToFile(List<Point2D> points, String filename) throws IOException {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(filename))) {
+            for (Point2D point : points) {
+                writer.write(point.getX()+"\t\t"+point.getY());
+                writer.newLine();
+            }
+        }
+    }
 
 
 

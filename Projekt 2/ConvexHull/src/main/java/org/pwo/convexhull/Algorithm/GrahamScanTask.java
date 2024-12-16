@@ -16,6 +16,8 @@ public class GrahamScanTask extends RecursiveTask<List<Point2D>> {
         if (_points.size() <= _minimumSize) {
             return GrahamScan.scan(this._points);
         } else {
+
+            _points.sort(Comparator.comparingDouble(Point2D::getX));
             // Divide the points into 2 groups based on the x coordiantes
             int middle = this._points.size() / 2;
 

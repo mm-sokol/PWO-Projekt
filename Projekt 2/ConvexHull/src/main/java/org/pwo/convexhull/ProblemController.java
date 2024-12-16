@@ -25,6 +25,7 @@ import org.pwo.convexhull.Geometry.PointScaler;
 import java.awt.geom.Point2D;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.concurrent.*;
 
@@ -51,8 +52,8 @@ public class ProblemController {
     @FXML
     private RadioButton radioBtnSequential;
 
-    @FXML
-    private ScrollPane scrollPane;
+//    @FXML
+//    private ScrollPane scrollPane;
 
     @FXML
     private VBox vBox;
@@ -92,16 +93,11 @@ public class ProblemController {
             System.out.println("Text entered (Enter): " + filename);
             if (!filename.isEmpty())
                 setUpProblem(filename);
+        } else if (event.getCode() == KeyCode.T && event.isAltDown()) {
+            debugTangentFindingAlgorithm();
+        } else if (event.getCode() == KeyCode.M && event.isAltDown()) {
+            debugMergeAlgorithm();
         }
-//        else if (event.getCode() == KeyCode.D && event.isAltDown()) {
-//
-//            try {
-//                switchToDebugScene(event);
-//            } catch (IOException e) {
-//                System.out.println("Error in handler onEnterTyped: "+ e.getMessage());
-//            }
-//
-//        }
     }
 
     @FXML
@@ -126,7 +122,7 @@ public class ProblemController {
         assert okButton != null : "fx:id=\"okButton\" was not injected: check your FXML file 'problem-view.fxml'.";
         assert problemCanvas != null : "fx:id=\"problemCanvas\" was not injected: check your FXML file 'problem-view.fxml'.";
         assert problemFileName != null : "fx:id=\"problemFileName\" was not injected: check your FXML file 'problem-view.fxml'.";
-        assert scrollPane != null : "fx:id=\"scrollPane\" was not injected: check your FXML file 'problem-view.fxml'.";
+//        assert scrollPane != null : "fx:id=\"scrollPane\" was not injected: check your FXML file 'problem-view.fxml'.";
 
         algorithmModeChoice.selectedToggleProperty().addListener((
                 (observable, oldChoice, newChoice) -> {
@@ -153,8 +149,8 @@ public class ProblemController {
         );
     }
 
-    private void drawLines(Color color, int width) {
-        if (_lines.size() < 2) {
+    private void drawLines(List<Point2D> lines, Color color, int width) {
+        if (lines.size() < 2) {
             return;
         }
         GraphicsContext gc = problemCanvas.getGraphicsContext2D();
@@ -162,10 +158,10 @@ public class ProblemController {
         gc.setLineWidth(width);
         _pointScaler.calculateOffsetsAndScale(_points);
 
-        Point2D firstTransformed = _pointScaler.transformToScale(_lines.getFirst());
+        Point2D firstTransformed = _pointScaler.transformToScale(lines.getFirst());
         Point2D lastTransformed = firstTransformed;
-        for (int i = 1; i < _lines.size(); i++) {
-            Point2D currentTransformed = _pointScaler.transformToScale(_lines.get(i));
+        for (int i = 1; i < lines.size(); i++) {
+            Point2D currentTransformed = _pointScaler.transformToScale(lines.get(i));
             drawLine(
                     lastTransformed,
                     currentTransformed
@@ -202,14 +198,19 @@ public class ProblemController {
 
     private void solveProblem(String choice) {
         if (choice.equals("Sequential")) {
+            System.out.println("Solving ConvexHull sequentially");
             _lines = GrahamScan.scan(_points);
-            drawLines(Color.BLUE, 3);
+            drawLines(_lines, Color.BLUE, 3);
+            System.out.println("Resulting set of points has "+_lines.size()+" elements");
+
         } else if (choice.equals("Parallel")) {
 
+            System.out.println("Solving ConvexHull using fork-join");
             GrahamScanTask task = new GrahamScanTask(12, _points);
             try (ForkJoinPool pool = new ForkJoinPool()) {
                 _lines = pool.invoke(task);
-                drawLines(Color.MEDIUMVIOLETRED, 3);
+                drawLines(_lines, Color.MEDIUMVIOLETRED, 3);
+                System.out.println("Resulting set of points has "+_lines.size()+" elements");
 
 
             } catch (RejectedExecutionException e) {
@@ -226,22 +227,84 @@ public class ProblemController {
         }
     }
 
-//    public void switchToDebugScene(Event event) throws IOException {
-//        try {
-//            FXMLLoader loader = new FXMLLoader(getClass().getResource("debug-view.fxml"));
-//            _root = loader.load();
-//
-//            DebugController debugController = loader.getController();
-//            debugController.setPoints(_points);
-//
-//            _stage = (Stage)((Node) event.getSource()).getScene().getWindow();
-//            _scene = new Scene(_root, 800, 800);
-//            _stage.setScene(_scene);
-//            _stage.show();
-//
-//        } catch (IOException e) {
-//            throw new RuntimeException(e);
-//        }
-//    }
+    private void debugTangentFindingAlgorithm() {
+        if (_points.size() < 2) {
+            return;
+        }
+        // make split
+        int middle = _points.size() / 2;
+        _points.sort(Comparator.comparingDouble(Point2D::getX));
+        List<Point2D> leftHalf = _points.subList(0, middle);
+        List<Point2D> rightHalf = _points.subList(middle, _points.size());
+
+        // compute hulls sequentially
+        List<Point2D> leftHull = GrahamScan.scan(leftHalf);
+        List<Point2D> rigthHull = GrahamScan.scan(rightHalf);
+        drawLines(leftHull, Color.BLUE, 3);
+        drawLines(rigthHull, Color.VIOLET, 3);
+
+        GraphicsContext gc = problemCanvas.getGraphicsContext2D();
+        gc.setStroke(Color.GREEN);
+        // draw upper tangent (might be buggy)
+        GrahamScan.Tuple<Integer, Integer> indexes = GrahamScan.findUpperTangent(leftHull, rigthHull);
+        Point2D start = leftHull.get(indexes.first());
+        Point2D end = rigthHull.get(indexes.second());
+        drawLine(
+                _pointScaler.transformToScale(start),
+                _pointScaler.transformToScale(end)
+        );
+
+        gc.setStroke(Color.MEDIUMAQUAMARINE);
+        // draw lower tangent
+        GrahamScan.Tuple<Integer, Integer> lowerIndexes = GrahamScan.findLowerTangent(leftHull, rigthHull);
+        Point2D lowerStart = leftHull.get(lowerIndexes.first());
+        Point2D lowerEnd = rigthHull.get(lowerIndexes.second());
+        drawLine(
+                _pointScaler.transformToScale(lowerStart),
+                _pointScaler.transformToScale(lowerEnd)
+        );
+    }
+
+
+    private void debugMergeAlgorithm() {
+        if (_points.size() < 2) {
+            return;
+        }
+        // make split
+        int middle = _points.size() / 2;
+        _points.sort(Comparator.comparingDouble(Point2D::getX));
+        List<Point2D> leftHalf = _points.subList(0, middle);
+        List<Point2D> rightHalf = _points.subList(middle, _points.size());
+
+        // compute hulls sequentially
+        List<Point2D> leftHull = GrahamScan.scan(leftHalf);
+        List<Point2D> rigthHull = GrahamScan.scan(rightHalf);
+        drawLines(leftHull, Color.BLUE, 3);
+        drawLines(rigthHull, Color.VIOLET, 3);
+
+        GraphicsContext gc = problemCanvas.getGraphicsContext2D();
+        gc.setStroke(Color.GREEN);
+        // draw upper tangent (might be buggy)
+        GrahamScan.Tuple<Integer, Integer> indexes = GrahamScan.findUpperTangent(leftHull, rigthHull);
+        Point2D start = leftHull.get(indexes.first());
+        Point2D end = rigthHull.get(indexes.second());
+        drawLine(
+                _pointScaler.transformToScale(start),
+                _pointScaler.transformToScale(end)
+        );
+
+        gc.setStroke(Color.MEDIUMAQUAMARINE);
+        // draw lower tangent
+        GrahamScan.Tuple<Integer, Integer> lowerIndexes = GrahamScan.findLowerTangent(leftHull, rigthHull);
+        Point2D lowerStart = leftHull.get(lowerIndexes.first());
+        Point2D lowerEnd = rigthHull.get(lowerIndexes.second());
+        drawLine(
+                _pointScaler.transformToScale(lowerStart),
+                _pointScaler.transformToScale(lowerEnd)
+        );
+
+        List<Point2D> mergedHull = GrahamScan.merge(leftHull, rigthHull);
+        drawLines(mergedHull, Color.SALMON, 3);
+    }
 
 }
