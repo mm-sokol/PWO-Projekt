@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.canvas.Canvas?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" onKeyPressed="#onKeyPressed" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.pwo.convexhull.DebugController">
+    <children>
+        <VBox fx:id="vBox" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+            <children>
+                <HBox fx:id="hBox" prefHeight="25.0">
+                    <children>
+                        <TextField fx:id="problemFileName" onKeyPressed="#onEnterTyped" promptText="Problem definition filename" HBox.hgrow="ALWAYS" />
+                        <Button fx:id="okButton" mnemonicParsing="false" onAction="#onOkClicked" prefWidth="35.0" text="Ok" />
+                    </children>
+                    <VBox.margin>
+                        <Insets left="4.0" right="4.0" />
+                    </VBox.margin>
+                </HBox>
+                <HBox prefHeight="0.0">
+               <children>
+                  <Button fx:id="rightButton" mnemonicParsing="false" onMouseClicked="#onLeftBtnClicked" prefHeight="25.0" prefWidth="35.0" text="&lt;" HBox.hgrow="ALWAYS">
+                     <HBox.margin>
+                        <Insets left="4.0" />
+                     </HBox.margin>
+                  </Button>
+                  <HBox prefHeight="100.0" prefWidth="200.0" HBox.hgrow="ALWAYS">
+                     <children>
+                        <Label fx:id="mainLabel" alignment="CENTER" prefHeight="25.0" prefWidth="523.0" text="Debug mode" textAlignment="CENTER" HBox.hgrow="ALWAYS" />
+                     </children>
+                  </HBox>
+                  <Button fx:id="leftButton" mnemonicParsing="false" onMouseClicked="#onRightButtonClicked" prefHeight="25.0" prefWidth="35.0" text="&gt;">
+                     <HBox.margin>
+                        <Insets right="4.0" />
+                     </HBox.margin>
+                  </Button>
+               </children>
+                </HBox>
+                <ScrollPane fx:id="scrollPane" onMouseClicked="#onMouseClick" prefHeight="111.0" prefWidth="600.0" VBox.vgrow="ALWAYS">
+                    <content>
+                        <Canvas fx:id="problemCanvas" height="861.0" onMouseClicked="#onMouseClick" width="800.0" />
+                    </content>
+                </ScrollPane>
+            </children>
+        </VBox>
+    </children>
+</AnchorPane>
