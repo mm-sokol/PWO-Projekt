@@ -1,38 +1,43 @@
 package org.pwo.convexhull;
 
-import org.pwo.convexhull.Geometry.PointOperations;
-import org.pwo.convexhull.Geometry.PointGenerator;
-
-import java.awt.geom.Point2D;
-import java.util.List;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.concurrent.ForkJoinPool;
+import java.util.stream.Stream;
 
 public class Main {
 
-//    C:\Users\MS\Desktop\PWO\Projekt\Projekt 2\ConvexHull\src\main\resources\problem10.txt
-
-    // Problem sizes
-    // small: number < 50
-    // medium: 100 < number < 1000
-    // large: 2000 < number < 10000
-    // very_large: number > 2000
 
     public static void main(String[] args) {
 
-        int version = 12;
-        String size = "large";
-        String filename = "C:\\Users\\MS\\Desktop\\PWO\\Projekt\\Projekt 2\\ConvexHull\\src\\main\\resources\\problems\\" +
-                 size + "\\problem" + version + "_" + size + ".txt";
+        Path rootDir = Paths.get("C:\\Users\\MS\\Desktop\\PWO\\Projekt\\Projekt 2\\ConvexHull\\src\\main\\resources\\problems\\medium");
 
-        List<Point2D> problem = PointGenerator.generateBounded( 5000,
-                PointGenerator.DistributionType.gaussian,
-                500, 200,
-                1600, 1000
-        );
+        try (ForkJoinPool pool = new ForkJoinPool()) {
+            try (Stream<Path> paths = Files.list(rootDir)) {
+                paths.filter(path -> path.toString().endsWith(".txt"))
+                        .forEach(path -> {
+                            System.out.println("ConvexHull task for: " + path);
 
-        try {
-            PointOperations.saveToFile(problem, filename);
-        } catch (Exception ex) {
-            System.out.println("Something went wrong: "+ ex.getMessage());
+
+
+
+
+                        });
+            } catch (IOException e) {
+                throw new RuntimeException("IO error: "+e.getMessage());
+            }
+        } catch (Exception e) {
+            System.out.println("Exception: "+e.getMessage());
         }
     }
 }
+
+
+//ForkJoinPool pool = new ForkJoinPool(
+//        parallelism,
+//        ForkJoinPool.defaultForkJoinWorkerThreadFactory,
+//        null,
+//        false ??
+//);

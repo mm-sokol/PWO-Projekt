@@ -307,4 +307,16 @@ public class ProblemController {
         drawLines(mergedHull, Color.SALMON, 3);
     }
 
+
+//    private void debugThreeSplits() {
+//        if (_points.size() < 100) {
+//            return;
+//        }
+//
+//        List<List<Point2D>> hulls = new ArrayList<>();
+//        for (int i = 0; i < 3; i++) {
+//
+//        }
+//    }
+
 }
