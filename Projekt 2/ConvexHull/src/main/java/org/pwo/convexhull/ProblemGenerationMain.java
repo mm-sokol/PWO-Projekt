@@ -5,6 +5,7 @@ import org.pwo.convexhull.Geometry.PointGenerator;
 
 import java.awt.geom.Point2D;
 import java.util.List;
+import java.util.Random;
 
 public class ProblemGenerationMain {
 
@@ -18,21 +19,28 @@ public class ProblemGenerationMain {
 
     public static void main(String[] args) {
 
-        int version = 2;
+        int num = 10;
+        int start = 1;
         String size = "extremely_large";
-        String filename = "C:\\Users\\MS\\Desktop\\PWO\\Projekt\\Projekt 2\\ConvexHull\\src\\main\\resources\\problems\\" +
-                 size + "\\problem" + version + "_" + size + ".txt";
+        Random random = new Random();
+        int min = 120_000;
+        int max = 200_000;
 
-        List<Point2D> problem = PointGenerator.generateBounded( 7000,
-                PointGenerator.DistributionType.clustered,
-                200, 800,
-                1600, 1000
-        );
+        for (int version = start; version < (start + num); version++) {
+            String filename = "C:\\Users\\MS\\Desktop\\PWO\\Projekt\\Projekt 2\\ConvexHull\\src\\main\\resources\\problems\\" +
+                     size + "\\clustered" + version + "_" + size + ".txt";
 
-        try {
-            PointOperations.saveToFile(problem, filename);
-        } catch (Exception ex) {
-            System.out.println("Something went wrong: "+ ex.getMessage());
+            List<Point2D> problem = PointGenerator.generateBounded( random.nextInt(max - min + 1) + min,
+                    PointGenerator.DistributionType.clustered,
+                    120, 600,
+                    1600, 1000
+            );
+
+            try {
+                PointOperations.saveToFile(problem, filename);
+            } catch (Exception ex) {
+                System.out.println("Something went wrong: "+ ex.getMessage());
+            }
         }
     }
 }

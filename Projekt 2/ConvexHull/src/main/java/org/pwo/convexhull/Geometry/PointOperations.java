@@ -21,7 +21,7 @@ public class PointOperations {
 
         try (Scanner scanner = new Scanner(new File(filename))) {
             while (scanner.hasNextLine()) {
-                System.out.println("We are reading file: "+filename);
+//                System.out.println("We are reading file: "+filename);
                 String line = scanner.nextLine();
                 String[] elements = line.split("\\s+");
 
