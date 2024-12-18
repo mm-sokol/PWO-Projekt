@@ -54,8 +54,8 @@ public class TimerMain {
             timeSequential(points, trials);
 
             int threadNum = 2;
-            for (int i = 0; i<threadCounts; i++) {
-                threadNum +=increment;
+            for (int i = 0; i<threadCounts; i++,threadNum*=increment) {
+
                 try (ForkJoinPool pool = new ForkJoinPool(
                         threadNum
                 )) {
@@ -73,7 +73,6 @@ public class TimerMain {
                     System.out.printf("[Threads %6d] Solving took: %d ms%n", threadNum, avgMs);
                 }
             }
-
 
         } catch (Exception e) {
             throw new RuntimeException(e.getMessage());
@@ -98,10 +97,11 @@ public class TimerMain {
 
     public static void main(String[] args) {
         try {
-            Path problem = Paths.get("C:\\Users\\MS\\Desktop\\PWO\\Projekt\\Projekt 2\\ConvexHull\\src\\main\\resources\\problems\\extremely_large\\clustered10_extremely_large.txt");
+            Path problem = Paths.get(".\\src\\main\\resources\\problems\\extremely_large\\clustered1_extremely_large.txt");
             List<Point2D> points = PointOperations.readFromFile(problem.toString());
-
-            differentThreadNum(points, 12, 7,20);
+            System.out.println("Problem size: "+points.size());
+            System.out.println("-------------------------------------------------------");
+            differentThreadNum(points, 12, 2,20);
             System.out.println("-------------------------------------------------------");
             differentThresholds(points, 20, 20);
 
