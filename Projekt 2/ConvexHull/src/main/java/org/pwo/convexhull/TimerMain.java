@@ -70,7 +70,7 @@ public class TimerMain {
                     }
 
                     long avgMs = total.toMillis() / trials;
-                    System.out.printf("[Threads %6d] Solving took: %d ms%n", threadNum, avgMs);
+                    System.out.printf("[Threads   %10d] Solving took: %d ms%n", threadNum, avgMs);
                 }
             }
 
@@ -91,7 +91,7 @@ public class TimerMain {
         }
 
         long avgMs = total.toMillis() / trials;
-        System.out.println("[Sequential ] Solving took: " + avgMs + " ms");
+        System.out.println("[Sequential          ] Solving took: " + avgMs + " ms");
     }
 
 
