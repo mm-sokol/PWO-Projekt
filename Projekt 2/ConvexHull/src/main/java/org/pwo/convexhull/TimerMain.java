@@ -55,7 +55,7 @@ public class TimerMain {
 
             int threadNum = 2;
             for (int i = 0; i<12; i++) {
-                threadNum *=2;
+                threadNum +=5;
                 try (ForkJoinPool pool = new ForkJoinPool(
                         threadNum
                 )) {
@@ -101,7 +101,9 @@ public class TimerMain {
             Path problem = Paths.get("C:\\Users\\MS\\Desktop\\PWO\\Projekt\\Projekt 2\\ConvexHull\\src\\main\\resources\\problems\\extremely_large\\clustered10_extremely_large.txt");
             List<Point2D> points = PointOperations.readFromFile(problem.toString());
 
-            differentThreadNum(points, 10);
+            differentThreadNum(points, 20);
+
+            differentThresholds(points, 20);
 
         } catch (Exception e) {
             System.out.println("Error occurred: "+e.getMessage());

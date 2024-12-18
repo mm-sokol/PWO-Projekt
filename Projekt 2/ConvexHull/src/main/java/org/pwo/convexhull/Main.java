@@ -32,18 +32,18 @@ public class Main {
                                 List<Point2D> points = PointOperations.readFromFile(path.toString());
                                 GrahamScanTask task = new GrahamScanTask(12, points);
                                 List<Point2D> results = pool.invoke(task);
-                                for (Point2D p : results) {
-                                    System.out.println(
-                                            "(" + p.getX() + ", " + p.getY() + ")"
-                                    );
-                                }
+//                                for (Point2D p : results) {
+//                                    System.out.println(
+//                                            "(" + p.getX() + ", " + p.getY() + ")"
+//                                    );
+//                                }
                             });
 
-                    Thread.sleep(2000);
+//                    Thread.sleep(2000);
                 } catch (IOException e) {
                     throw new RuntimeException("IO error: " + e.getMessage());
-                } catch (InterruptedException ie) {
-                    throw new RuntimeException("Interruption: " + ie.getMessage());
+//                } catch (InterruptedException ie) {
+//                    throw new RuntimeException("Interruption: " + ie.getMessage());
                 }
             }
         } catch (Exception e) {
