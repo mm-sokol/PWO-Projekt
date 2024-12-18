@@ -4,6 +4,7 @@ import org.pwo.convexhull.Algorithm.GrahamScanTask;
 import org.pwo.convexhull.Geometry.PointOperations;
 
 import java.awt.geom.Point2D;
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -12,14 +13,12 @@ import java.util.List;
 import java.util.concurrent.ForkJoinPool;
 import java.util.stream.Stream;
 
-import static org.pwo.convexhull.Geometry.PointOperations.readFromFile;
-
-public class Main {
+public class ProfilerMain {
 
 
     public static void main(String[] args) {
 
-        Path rootDir = Paths.get("C:\\Users\\MS\\Desktop\\PWO\\Projekt\\Projekt 2\\ConvexHull\\src\\main\\resources\\problems");
+        Path rootDir = Paths.get(".\\src\\main\\resources\\problems");
 
         try (ForkJoinPool pool = new ForkJoinPool()) {
 
@@ -39,7 +38,7 @@ public class Main {
 //                                }
                             });
 
-//                    Thread.sleep(2000);
+//                    Thread.sleep(1000);
                 } catch (IOException e) {
                     throw new RuntimeException("IO error: " + e.getMessage());
 //                } catch (InterruptedException ie) {

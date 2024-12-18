@@ -8,9 +8,6 @@ import java.util.List;
 import java.util.Random;
 
 public class ProblemGenerationMain {
-
-//    C:\Users\MS\Desktop\PWO\Projekt\Projekt 2\ConvexHull\src\main\resources\problem10.txt
-
     // Problem sizes
     // small: number < 50
     // medium: 100 < number < 1000
@@ -21,13 +18,13 @@ public class ProblemGenerationMain {
 
         int num = 10;
         int start = 1;
-        String size = "extremely_large";
+        String size = "medium";
         Random random = new Random();
-        int min = 120_000;
-        int max = 200_000;
+        int min = 100;
+        int max = 1000;
 
         for (int version = start; version < (start + num); version++) {
-            String filename = "C:\\Users\\MS\\Desktop\\PWO\\Projekt\\Projekt 2\\ConvexHull\\src\\main\\resources\\problems\\" +
+            String filename = ".\\src\\main\\resources\\problems\\" +
                      size + "\\gaussian" + version + "_" + size + ".txt";
 
             List<Point2D> problem = PointGenerator.generateBounded( random.nextInt(max - min + 1) + min,
