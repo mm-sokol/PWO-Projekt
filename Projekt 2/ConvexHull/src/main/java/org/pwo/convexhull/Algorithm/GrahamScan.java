@@ -31,10 +31,12 @@ public class GrahamScan {
         int vecEnd = 1;
         for (int i = 2; i < hull.size(); i++) {
 
-            // while hull[i] is collinear or to the right of vector [hull[vecEnd-1], hull[vecEnd]]
+            // while 3 checked points make counterClockwise turn we don't have to
+            // swap anything, otherwise backtrack one step
+            // and swap currently checked i-th element with vecEnd
             while (PointOperations.counterClockwise(hull.get(vecEnd-1), hull.get(vecEnd), hull.get(i))<=0) {
 
-                if (vecEnd>1) { // check different vector
+                if (vecEnd>1) { // backtracking
                     vecEnd--;
                 } else if (vecEnd==1) { // there's nothing we can do if vecEnd==1
                     break;

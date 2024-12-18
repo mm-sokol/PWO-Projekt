@@ -28,11 +28,11 @@ public class ProblemGenerationMain {
 
         for (int version = start; version < (start + num); version++) {
             String filename = "C:\\Users\\MS\\Desktop\\PWO\\Projekt\\Projekt 2\\ConvexHull\\src\\main\\resources\\problems\\" +
-                     size + "\\clustered" + version + "_" + size + ".txt";
+                     size + "\\gaussian" + version + "_" + size + ".txt";
 
             List<Point2D> problem = PointGenerator.generateBounded( random.nextInt(max - min + 1) + min,
                     PointGenerator.DistributionType.clustered,
-                    120, 600,
+                    200, 320,
                     1600, 1000
             );
 

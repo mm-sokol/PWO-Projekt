@@ -15,7 +15,7 @@ import java.util.concurrent.ForkJoinPool;
 
 public class TimerMain {
 
-    public static void differentThresholds(List<Point2D> points, int trials) {
+    public static void differentThresholds(List<Point2D> points, int thresholdCounts, int trials) {
         try (ForkJoinPool pool = new ForkJoinPool()) {
 
             List<Point2D> result = new ArrayList<>();
@@ -24,7 +24,7 @@ public class TimerMain {
             timeSequential(points, trials);
 
             int threshold = 2;
-            for (int j = 0; j<25; j++) {
+            for (int j = 0; j<thresholdCounts; j++) {
                 threshold *= 2;
                 GrahamScanTask task = new GrahamScanTask(threshold, points);
 
@@ -46,7 +46,7 @@ public class TimerMain {
         }
     }
 
-    public static void differentThreadNum(List<Point2D> points, int trials) {
+    public static void differentThreadNum(List<Point2D> points, int threadCounts, int increment, int trials) {
         try {
             List<Point2D> result = new ArrayList<>();
             Instant start, end;
@@ -54,8 +54,8 @@ public class TimerMain {
             timeSequential(points, trials);
 
             int threadNum = 2;
-            for (int i = 0; i<12; i++) {
-                threadNum +=5;
+            for (int i = 0; i<threadCounts; i++) {
+                threadNum +=increment;
                 try (ForkJoinPool pool = new ForkJoinPool(
                         threadNum
                 )) {
@@ -101,9 +101,9 @@ public class TimerMain {
             Path problem = Paths.get("C:\\Users\\MS\\Desktop\\PWO\\Projekt\\Projekt 2\\ConvexHull\\src\\main\\resources\\problems\\extremely_large\\clustered10_extremely_large.txt");
             List<Point2D> points = PointOperations.readFromFile(problem.toString());
 
-            differentThreadNum(points, 20);
-
-            differentThresholds(points, 20);
+            differentThreadNum(points, 12, 7,20);
+            System.out.println("-------------------------------------------------------");
+            differentThresholds(points, 20, 20);
 
         } catch (Exception e) {
             System.out.println("Error occurred: "+e.getMessage());
